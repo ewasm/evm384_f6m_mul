@@ -15,4 +15,4 @@ git submodule update --init --recursive
 ```
 
 ### Build and benchmark `f6m_mul`:
-`python3 benchmark.py`
+`make && ./run_bench.sh`
