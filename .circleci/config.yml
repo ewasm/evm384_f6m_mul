@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: jwasinger/solc-evm384-v2
+    steps:
+      - checkout
+      - run:
+          name: stuff
+          command: bash .circleci/ci.sh
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build

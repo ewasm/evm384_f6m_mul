@@ -14,5 +14,8 @@ git submodule update --init --recursive
 (cd solidity && mkdir build && cd build && cmake .. && make -j4)
 ```
 
-### Build and benchmark `f6m_mul`:
-`make && ./run_bench.sh`
+### Build benchmark and unit test:
+`make` which stores bytecode under `build` folder
+
+### Build CircleCI Docker Image
+`make circleci_build_image`
