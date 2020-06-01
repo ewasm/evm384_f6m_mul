@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -e
 
 mkdir build
 solc --strict-assembly --optimize src/f6m_mul/test.yul | awk '/Binary representation:/ { getline; print $0 }' > build/test.bin
