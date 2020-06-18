@@ -6,6 +6,11 @@
         mstore(add(dst, 32), lo)
     }
 
+    function zero512(dst) {
+        mstore(dst, 0)
+	mstore(add(dst, 32), 0)
+    }
+
     function mulNR2(x0, x1, r0, r1, modulus) {
         // r0 <- x0 - x1
         submod384(r0, x0, x1, modulus)
@@ -31,6 +36,7 @@
         let tmp := add(mem, 64)
         let tmp2 := add(tmp, 64)
         let zero := add(tmp2, 64)
+	zero512(zero)
 
         // TODO also cache x0y0 calculation
 
