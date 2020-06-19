@@ -1,3 +1,5 @@
 #! /usr/bin/env bash
 
-./evmc/build/bin/evmc run --gas 100000000 --vm evmone/build/lib/libevmone.so $(cat build/f6m_mul_bench.bin)
+set -e
+
+./evmc/build/bin/evmc run --gas 100000000 --vm ./deps/v2/evmone/build/lib/libevmone.so $(cat $1)
