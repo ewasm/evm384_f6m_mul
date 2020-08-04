@@ -56,9 +56,6 @@
 
         // r1 = ((y0 + y1) * (x0 + x1)) - ((x0 * y0) + (x1 * y1))
 
-        // tmp2 <- x1 * y1
-        mulmodmont384(tmp2, add(x, 64), add(y, 64), modulus, inv)
-
         // tmp2 <- tmp (x0 * y0) + tmp2 (x1 * y1)
         addmod384(tmp2, tmp, tmp2, modulus)
 
