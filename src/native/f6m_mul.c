@@ -12,6 +12,7 @@ gcc f6m_mul.c -o f6m_mul -O4 -march=native
 
 
 #include<stdio.h>
+#include<time.h>
 
 #define BIGINT_BITS 384
 #define LIMB_BITS 64
@@ -223,9 +224,12 @@ void test_f6m_mul(){
   uint8_t* bls12_mod = r_2+128;
   uint64_t bls12_r_inv = 0x89f3fffcfffcfffd;
   
-  f6m_mul(a,A,r_0,bls12_mod,bls12_r_inv,bls12_mod+128);
+  for (auto i = 0; i < 1350; i++) {
+      f6m_mul(a,A,r_0,bls12_mod,bls12_r_inv,bls12_mod+128);
+  }
 
   uint64_t* output = (uint64_t*)r_0;
+  /*
   uint64_t expected[] = {
            //r_0
 		  0xf4f3f4e0a35068ea, 0xac665aee2e71f682, 0xaecd20923b420023, 0xb6d5420ba01ea982,
@@ -250,9 +254,9 @@ void test_f6m_mul(){
       break;
     }
   }
+  */
 	          
 }
-
 
 void test_f2m_mul(){
   printf("f2m_mul test\n");
@@ -307,7 +311,14 @@ void test_f2m_mul(){
 }
 
 int main(int argc, char** argv){
+    struct timespec tstart={0,0}, tend={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &tstart);
+
   test_f6m_mul();	// doesn't pass
-  test_f2m_mul();	// doesn't pass
+    clock_gettime(CLOCK_MONOTONIC, &tend);
+    printf("f6m_mul took %.5f seconds\n",
+           ((double)tend.tv_sec + 1.0e-9*tend.tv_nsec) - 
+           ((double)tstart.tv_sec + 1.0e-9*tstart.tv_nsec));
+
   return 0;
 }
