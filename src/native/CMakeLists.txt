@@ -3,5 +3,5 @@ project (f6m_mul_native)
 
 include_directories(./intx/include)
 
-add_executable(f6m_mul_test f6m_mul.h test.cpp)
-add_executable(f6m_mul_benchmark f6m_mul.h benchmark.cpp)
+add_executable(test f6m_mul.h test.cpp)
+add_executable(synth_loop_benchmark f6m_mul.h benchmark.cpp)
