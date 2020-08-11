@@ -29,6 +29,7 @@ uint64_t* BignumInvPointer = reinterpret_cast<uint64_t*>(&BignumInv64);
 // typedef intx::uint512 F1;
 
 struct F1 {
+public:
     intx::uint512 elem;
 
     std::string to_string();
@@ -42,6 +43,7 @@ struct F1 {
 };
 
 struct F2 {
+public:
     F1 x;
     F1 y;
 
