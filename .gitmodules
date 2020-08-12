@@ -16,3 +16,6 @@
 [submodule "deps/evmc"]
 	path = deps/evmc
 	url = https://github.com/ethereum/evmc
+[submodule "src/native/intx"]
+	path = src/native/intx
+	url = https://github.com/chfast/intx
