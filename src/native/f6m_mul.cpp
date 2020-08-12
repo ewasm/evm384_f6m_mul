@@ -1,16 +1,3 @@
-/*
-This is a direct translation of: https://github.com/ewasm/evm384_f6m_mul/blob/master/src/v2/test.yul
-
-To execute:
-git clone https://github.com/poemm/bigint_experiments.git
-cd bigint_experiments
-git clone https://gist.github.com/4ad8279ea1693c13a16b134970d67101.git f6m_mul_gist
-cd f6m_mul_gist
-gcc f6m_mul.c -o f6m_mul -O4 -march=native
-./f6m_mul
-*/
-
-
 #include<stdio.h>
 #include<iostream>
 #include<iomanip>
