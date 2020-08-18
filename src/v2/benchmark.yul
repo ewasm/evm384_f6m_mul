@@ -369,6 +369,8 @@
             mstore(bls12_mod,          0xabaafffffffffeb9ffff53b1feffab1e24f6b0f6a0d23067bf1285f3844b7764)
             mstore(add(bls12_mod, 32), 0xd7ac4b43b6a71b4b9ae67f39ea11011a00000000000000000000000000000000)
 
+            mstore(4090, 0x0)
+
             let inv :=         0x89f3fffcfffcfffd
 
             //let point1_a := msize()
