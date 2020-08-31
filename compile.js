@@ -10,7 +10,8 @@ const { inputMap, macros, jumptables } = parser.parseFile('f2m_mul.huff', pathTo
 
 const {
     data: { bytecode: macroCode },
-} = parser.processMacro('F2M_MUL', 0, [], macros, inputMap, jumptables);
+//} = parser.processMacro('F2M_MUL_TESTER_CALLDATA', 0, [], macros, inputMap, jumptables);
+} = parser.processMacro('F2M_MUL_BENCHER', 0, [], macros, inputMap, jumptables);
 
 console.log("0x"+macroCode)
 
