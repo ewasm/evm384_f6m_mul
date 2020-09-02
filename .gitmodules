@@ -16,3 +16,9 @@
 [submodule "deps/evmc"]
 	path = deps/evmc
 	url = https://github.com/ethereum/evmc
+[submodule "deps/v2-no-curve-params/evmone"]
+	path = deps/v2-no-curve-params/evmone
+	url = https://github.com/jwasinger/evmone
+[submodule "deps/v2-no-curve-params/solidity"]
+	path = deps/v2-no-curve-params/solidity
+	url = https://github.com/jwasinger/solidity

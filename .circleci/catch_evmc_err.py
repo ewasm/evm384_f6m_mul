@@ -5,5 +5,5 @@ lines = "\n".join(lines)
 
 print(lines)
 
-if "revert" in lines:
+if not "success" in lines:
     sys.exit(-1)
