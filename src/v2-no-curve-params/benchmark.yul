@@ -30,7 +30,11 @@
         
         let tmp := add(mem, 64)
         let tmp2 := add(tmp, 64)
+
+        // TODO cache zero as constant
         let zero := add(tmp2, 64)
+        mstore(zero, 0x0000000000000000000000000000000000000000000000000000000000000000)
+        mstore(add(zero, 32), 0x0000000000000000000000000000000000000000000000000000000000000000)
 
         // TODO also cache x0y0 calculation
 
@@ -275,7 +279,6 @@
             f6m_mul(point1_a, point2_A, f6m_result4, f6m_scratch_spaace)
             f6m_mul(point1_a, f6m_result4, f6m_result5, f6m_scratch_spaace)
 
-	    return(0, 64)
             let i := 0
             for {} lt(i, 135) {i := add(i, 1)} {
                 f6m_mul(f6m_result4, f6m_result5, f6m_result1, f6m_scratch_spaace)
