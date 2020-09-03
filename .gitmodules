@@ -6,7 +6,7 @@
 	url = https://github.com/axic/evmone
 [submodule "evmone-v2"]
 	path = deps/v2/evmone
-	url = https://github.com/axic/evmone
+	url = https://github.com/ethereum/evmone
 [submodule "solidity-v2"]
 	path = deps/v2/solidity
 	url = https://github.com/ethereum/solidity
@@ -22,3 +22,9 @@
 [submodule "deps/v2-no-curve-params/solidity"]
 	path = deps/v2-no-curve-params/solidity
 	url = https://github.com/jwasinger/solidity
+[submodule "deps/v3/evmone"]
+	path = deps/v3/evmone
+	url = https://github.com/ethereum/evmone
+[submodule "deps/v3-no-curve-params/evmone"]
+	path = deps/v3-no-curve-params/evmone
+	url = https://github.com/jwasinger/evmone
