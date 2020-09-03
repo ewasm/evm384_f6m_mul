@@ -783,8 +783,10 @@ loop:
   1000 		// memory offset to jumpdest table		[iterator 1000]
   dup2 1 add	// increment iter variable			[iterator 1000 iterator+1]
   swap2 	// put iter variable in its place		[iterator+1 1000 iterator]
-  pop 		// 
-  dup2 100 lt 32 mul add mload jump   // where the number before lt is iter_count
+  pop 		// dump old iterator				[iterator+1 1000]
+  dup2 F2M_MUL_BENCHER_NUM_ITERS() lt	// see if exceed F2M_MUL_BENCHER_NUM_ITERS iters [iterator+1 1000 0_or_1]
+  32 mul add 	// offset to jump to				[iterator+1 1000_or_1032]
+  mload jump    // where the number before lt is iter_count
 
   //  __tablesize(JUMP_TABLE) __tablestart(JUMP_TABLE) 0x00 codecopy
   //  0x00 calldataload mload jump
