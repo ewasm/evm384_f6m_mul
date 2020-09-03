@@ -3,8 +3,6 @@ FROM ewasm/llvm-10:1
 RUN apt update && apt install -y git make python3
 
 
-# TODO only copy solc (and things that take too long to build in CI)
-
 COPY deps/v2/solidity/build/solc/solc /root/project-deps/deps/v2/solidity/build/solc/solc
 COPY deps/v2/evmone/build/lib/libevmone.so /root/project-deps/deps/v2/evmone/build/lib/libevmone.so 
 
