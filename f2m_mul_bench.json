@@ -1,5 +1,5 @@
 {
-    "f2m_mul2_bencher" : {
+    "f2m_mul_bench" : {
         "_info" : {
             "comment" : "",
             "filledwith" : "testeth 1.8.0-6+commit.c7ba3b69",

@@ -13,8 +13,9 @@ const {
     data: { bytecode: macroCode },
 //} = parser.processMacro('F2M_MUL_TESTER_HARDCODED', 0, [], macros, inputMap, jumptables);
 //} = parser.processMacro('F2M_MUL_TESTER_CALLDATA', 0, [], macros, inputMap, jumptables);
-} = parser.processMacro('F2M_MUL_BENCHER', 0, [], macros, inputMap, jumptables);
+//} = parser.processMacro('F2M_MUL_BENCHER', 0, [], macros, inputMap, jumptables);
 //} = parser.processMacro('F6M_MUL_TESTER_HARDCODED', 0, [], macros, inputMap, jumptables);
+} = parser.processMacro('F6M_MUL_BENCHER', 0, [], macros, inputMap, jumptables);
 
 console.log("0x"+macroCode)
 
