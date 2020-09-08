@@ -119,7 +119,6 @@ registers are
 0x1a1a1b mulmodmont384		// tmp2 = tmp2*tmp3
 0x121a19 submod384		// out1 = tmp2-tmp1
 
-/*
 // F6M_MUL_R2
 // f2m_add tmp1 = a + c
 0x130105 addmod384	
@@ -206,7 +205,6 @@ registers are
 // f2m_add r0 = aA + tmp3
 0x1c0d17 addmod384	
 0x1d0e18 addmod384	
-*/
 
 /*
 // pseudo-code for f6m_mul
@@ -297,14 +295,16 @@ f2m_add r0 = aA + tmp3
   0xabaafffffffffeb9ffff53b1feffab1e24f6b0f6a0d23067bf1285f3844b7764 EVAL_ARITHMETIC<MOD_OFFSET*1>() mstore
   0xd7ac4b43b6a71b4b9ae67f39ea11011a00000000000000000000000000000000 EVAL_ARITHMETIC<MOD_OFFSET+32>() mstore
   // inv for bls12-381
-  0x89f3fffcfffcfffd000000000000000000000000000000000000000000000000 EVAL_ARITHMETIC<MOD_OFFSET+48>() mstore
+  //0x89f3fffcfffcfffd000000000000000000000000000000000000000000000000 EVAL_ARITHMETIC<MOD_OFFSET+48>() mstore
+  0xfdfffcfffcfff389000000000000000000000000000000000000000000000000 EVAL_ARITHMETIC<MOD_OFFSET+48>() mstore
+
+
 
   // call f6m_mul over above memory
   F6M_MUL()
 
   // return output
-  //288 F6M_MUL_OUT() return
-  288 F6M_MUL_BUFFER_AA_BB_CC() return
+  288 F6M_MUL_OUT() return
 
 /*
 output should be:
