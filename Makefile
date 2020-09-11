@@ -1,5 +1,5 @@
 all: clean build
-build: build_dir v1 v2 v2_no_curve_params v3 v3_no_curve_params
+build: build_dir v1 v2 v4 v3 v5 
 build_dir:
 	mkdir build
 
@@ -9,11 +9,11 @@ v3:
 v2:
 	./deps/v2/solidity/build/solc/solc --strict-assembly --optimize src/v2/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v2-f6m_mul_bench.bin
 	./deps/v2/solidity/build/solc/solc --strict-assembly --optimize src/v2/test.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v2-test.bin
-v2_no_curve_params:
-	./deps/v2-no-curve-params/solidity/build/solc/solc --strict-assembly --optimize src/v2-no-curve-params/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v2-no-curve-params-f6m_mul_bench.bin
-	./deps/v2-no-curve-params/solidity/build/solc/solc --strict-assembly --optimize src/v2-no-curve-params/test.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v2-no-curve-params-test.bin
-v3_no_curve_params:
-	./deps/v2-no-curve-params/solidity/build/solc/solc --strict-assembly --optimize src/v3-no-curve-params/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v3-no-curve-params-f6m_mul_bench.bin
+v4:
+	./deps/v4/solidity/build/solc/solc --strict-assembly --optimize src/v4/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v4-f6m_mul_bench.bin
+	./deps/v4/solidity/build/solc/solc --strict-assembly --optimize src/v4/test.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v4-test.bin
+v5:
+	./deps/v4/solidity/build/solc/solc --strict-assembly --optimize src/v5/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v5-f6m_mul_bench.bin
 v1:
 	./deps/v1/solidity/build/solc/solc --strict-assembly --optimize src/v1/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v1-f6m_mul_bench.bin
 
