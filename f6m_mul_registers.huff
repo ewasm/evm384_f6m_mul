@@ -400,7 +400,7 @@ loop:
   mload jump    // where the number before lt is iter_count
 
 done:
-  0xff 0 mstore8 1 0 return	// return a single byte, 0x00
+  0xff 0 mstore8 1 0 return	// return a single byte, 0xff, to make sure it executed this far
   //stop
 
 }
