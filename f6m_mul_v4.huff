@@ -1,0 +1,840 @@
+
+// TODO optmizations
+//   inline F2M_ADD, F2M_SUB, and MUL_NR2, saving 34 operations
+
+
+// this is a dummy macro which lets me evaluate arithmetic at compile-time
+template<val>
+#define macro EVAL_ARITHMETIC = takes(0) returns(1) {
+  <val>
+}
+
+
+// these are various hard-coded memory offsets which we use for various buffers
+
+#define macro NUM_BYTES = takes(0) returns(1) {
+  48
+}
+
+#define macro F6M_MUL_OUT = takes(0) returns(1) {	// 6 values
+  0
+}
+
+#define macro F2M_MUL_BUFFER = takes(0) returns(1) {	// 4 values
+  300
+}
+
+#define macro F6M_MUL_R_BUFFER = takes(0) returns(1) {	// 6 values, but we have 8 values, first two zeros
+  500
+}
+
+#define macro F6M_MUL_BUFFER_AA_BB_CC = takes(0) returns(1) {	// 6 values
+  900
+}
+
+#define macro F6_ABC0 = takes(0) returns(1) {	// 6 values
+  1200
+}
+
+#define macro F6_ABC = takes(0) returns(1) {	// 6 values
+  1500
+}
+
+#define macro MOD_OFFSET = takes(0) returns(1) {	// 1.5 values
+  1800
+}
+
+
+// next we have various macros for f2m and f6m arithmetic, including multiplication.
+
+
+#define macro MUL_NR2 = takes(5) returns(0) {
+  // inputs: &x0, &x1, &out0, &out1
+  // outputs: out0,out1 := x0-x1, x0+x1
+
+  dup2	// x1
+  dup2	// x0
+  dup5	// out0
+  submod384
+
+  dup2	// x1
+  dup2	// x0
+  dup6	// out1
+  addmod384
+
+  pop
+  pop
+  pop
+  pop
+}
+
+#define macro F2M_ADD = takes(7) returns(0) {
+  // &x0, &x1, &y0, &y1, &out0, &out1
+  // outputs: out0,out1 := x0+y0, x1+y1
+
+  dup3	// y0
+  dup2	// x0
+  dup7	// out0
+  addmod384
+
+  dup4	// y1
+  dup3	// x1
+  dup8	// out1
+  addmod384
+
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+}
+
+#define macro F2M_SUB = takes(7) returns(0) {
+  // inputs: &x0, &x1, &y0, &y1, &out0, &out1
+  // outputs: out0,out1 := x0-y0, x1-y1
+
+  dup3	// y0
+  dup2	// x0
+  dup7	// out0
+  submod384
+
+  dup4	// y1
+  dup3	// x1
+  dup8	// out1
+  submod384
+
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+}
+
+#define macro F2M_MUL = takes(4) returns(0) {
+  // input stack shoud be:
+  //  &x0 &x1 &y0 &y1 &out0 &out1
+  //  where &out is top of stack, and x is the 48-byte value at memory location &x
+
+  // Will use memory offsets for temporary values
+  // F2M_MUL_BUFFER()+NUM_BYTES*0	// &zero	<- we assume this is always zero for NUM_BYTES bytes
+  // F2M_MUL_BUFFER()+NUM_BYTES*1  	// &tmp1
+  // F2M_MUL_BUFFER()+NUM_BYTES*2	// &tmp2
+  // F2M_MUL_BUFFER()+NUM_BYTES*3 	// &tmp3
+  
+  // &tmp1 = x0*y0
+  dup3						// &y0
+  dup2						// &x0
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*1>()	// &tmp1
+  mulmodmont384
+
+  // &tmp2 = x1*y1
+  dup4						// &y1
+  dup3						// &x1
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  mulmodmont384
+  
+  // &tmp3 = 0-&tmp2
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*0>()	// &zero
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*3>()	// &tmp3
+  submod384
+
+  // &out0 = &tmp1 + &tmp3
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*3>()	// &tmp3
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*1>()	// &tmp1
+  dup7						// &out0
+  addmod384
+  
+  // &tmp1 = &tmp1 + &tmp2
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*1>()	// &tmp1
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*1>()	// &tmp1
+  addmod384
+  
+  // recall, stack looks like:
+  //   &x0 &x1 &y0 &y1 &out0 &out1
+
+  // &tmp2 = &x0 + &x1
+  dup2						// &x1
+  dup2						// &x0
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  addmod384
+
+  // &tmp3 = &y0 + &y1
+  dup4						// &y1
+  dup4						// &y0
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*3>()	// &tmp3
+  addmod384
+
+  // &tmp2 = &tmp2 * &tmp3
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*3>()	// &tmp3
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  mulmodmont384
+
+  // &out1 = &tmp2 - &tmp1
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*1>()	// &tmp1
+  EVAL_ARITHMETIC<F2M_MUL_BUFFER+NUM_BYTES*2>()	// &tmp2
+  dup8						// &out1
+  submod384
+
+  // clear stack
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+}
+
+#define macro F6M_MUL_r2 = takes(0) returns(0) {
+  // stack will remain:  &a0 &a1 &b0 &b1 &c0 &c1 &A0 &A1 &B0 &B1 &C0 &C1 &r
+  // output: r2 := ((a + c) * (A + C) - (a * A + c * C)) + bB
+  
+  // tmp1 := a + c 
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  dup8	 	// &c1
+  dup8	 	// &c0
+  dup6	 	// &a1
+  dup6 		// &a0
+  F2M_ADD()
+
+  // tmp2 := A + C
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  dup14	 	// &C1
+  dup14  	// &C0
+  dup12  	// &A1
+  dup12		// &A0
+  F2M_ADD()
+ 
+  // tmp3 := tmp1 * tmp2
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  F2M_MUL()
+ 
+  // tmp1 := aA + cC
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+1*NUM_BYTES>()	// &aA1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+0*NUM_BYTES>()	// &aA0
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+1*NUM_BYTES>()	// &cC1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+0*NUM_BYTES>()	// &cC0
+  F2M_ADD()
+  
+  // tmp2 := tmp3 - tmp1
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  F2M_SUB()
+  
+  // r_2 := bB + tmp2 
+  dup13	EVAL_ARITHMETIC<NUM_BYTES*2*2+1*NUM_BYTES>() add	// &r21
+  NUM_BYTES() dup2 sub						// &r20 (=&r21-NUM_BYTES)
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+1*NUM_BYTES>()	// &bB1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+0*NUM_BYTES>()	// &bB0
+  F2M_ADD()
+
+}  
+
+#define macro F6M_MUL_r1 = takes(0) returns(0) {
+  // stack will remain:  &a0 &a1 &b0 &b1 &c0 &c1 &A0 &A1 &B0 &B1 &C0 &C1 &r
+  // output: r1 := ((a+b * A+B) - aA+bB) + mulNonResidue(cC)
+  
+  // tmp1 := a + b 
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  dup6	 	// &b1
+  dup6	 	// &b0
+  dup6	 	// &a1
+  dup6 		// &a0
+  F2M_ADD()
+
+  // tmp2 := A + B
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  dup12	 	// &B1
+  dup12  	// &B0
+  dup12  	// &A1
+  dup12		// &A0
+  F2M_ADD()
+ 
+  // tmp3 := tmp1 * tmp2
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  F2M_MUL()
+ 
+  // tmp1 := aA + bB
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+1*NUM_BYTES>()	// &bB1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+0*NUM_BYTES>()	// &bB0
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+1*NUM_BYTES>()	// &aA1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+0*NUM_BYTES>()	// &aA0
+  F2M_ADD()
+  
+  // tmp2 := tmp3 - tmp1
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  F2M_SUB()
+
+  // tmp1 := mulNonResidue(cC)
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+1*NUM_BYTES>()	// &cC1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+0*NUM_BYTES>()	// &cC0
+  MUL_NR2()
+  
+  // r1 := tmp1 + tmp2 
+  dup13	EVAL_ARITHMETIC<NUM_BYTES*2*1+1*NUM_BYTES>() add	// &r11
+  NUM_BYTES() dup2 sub					// &r10 (=&r11-NUM_BYTES)
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  F2M_ADD()
+}  
+
+#define macro F6M_MUL_r0 = takes(0) returns(0) {
+  // stack will remain:  &a0 &a1 &b0 &b1 &c0 &c1 &A0 &A1 &B0 &B1 &C0 &C1 &r
+  // output: r0 := aA + mulNonResidue((b + c) * (B + C) - (bB + cC))
+  
+  // tmp1 := b + c
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  dup8	 	// &c1
+  dup8		// &c0
+  dup8	 	// &b1
+  dup8	 	// &b0
+  F2M_ADD()
+
+  // tmp2 := B + C
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  dup14  	// &C1
+  dup14		// &C0
+  dup14	 	// &B1
+  dup14  	// &B0
+  F2M_ADD()
+ 
+  // tmp3 := tmp1 * tmp2
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  F2M_MUL()
+ 
+  // tmp1 := bB + cC
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+1*NUM_BYTES>()	// &cC1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+0*NUM_BYTES>()	// &cC0
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+1*NUM_BYTES>()	// &bB1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+0*NUM_BYTES>()	// &bB0
+  F2M_ADD()
+  
+  // tmp2 := tmp3 - tmp1
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+1*NUM_BYTES>()	// &tmp11
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*1+0*NUM_BYTES>()	// &tmp10
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  F2M_SUB()
+
+  // tmp3 := mulNonResidue(tmp2)
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+1*NUM_BYTES>()	// &tmp21
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*2+0*NUM_BYTES>()	// &tmp20
+  MUL_NR2()
+  
+  // r_0 := tmp3 + aA
+  dup13	EVAL_ARITHMETIC<NUM_BYTES*2*0+1*NUM_BYTES>() add	// &r01
+  NUM_BYTES() dup2 sub					// &r00 (=&r01-NUM_BYTES)
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+1*NUM_BYTES>()	// &aA1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+0*NUM_BYTES>()	// &aA0
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+1*NUM_BYTES>()	// &tmp31
+  EVAL_ARITHMETIC<F6M_MUL_R_BUFFER+NUM_BYTES*2*3+0*NUM_BYTES>()	// &tmp30
+  F2M_ADD()
+}  
+
+// this is the main macro for f6m_mul
+#define macro F6M_MUL = takes(8) returns(0) {
+  // input stack: &r &abc &ABC
+  // output r0,r1,r2 := [a, b, c] * [A, B, C]
+
+  // 48 96 144 192 240 288
+
+  // prepare stack for each function used by f6m_mul
+  //   &a0 &a1 &b0 &b1 &c0 &c1 &A0 &A1 &B0 &B1 &C0 &C1 &r
+  // then can prepare calls based on this stack
+  swap2		// &ABC &abc &r
+  swap1		// &abc &ABC &r
+  // now convert [&abc &ABC] to [&a0 &a1 &b0 &b1 &c0 &c1 &A0 &A1 &B0 &B1 &C0 &C1]
+  dup2 240 add	// &C1 &abc &ABC
+  swap2		// &ABC &abc &C1
+  dup1 192 add	// &C0 &ABC &abc &C1
+  swap2		// &abc &ABC &C0 &C1
+  dup2 144 add	// &B1 &abc &ABC &C0 &C1
+  swap2		// &ABC &abc &B1 &C0 &C1
+  dup1 96 add	// &B0 &ABC &abc &B1 &C0 &C1
+  swap2		// &abc &ABC &B0 &B1 &C0 &C1
+  dup2 48 add	// &A1 &abc &ABC &B0 &B1 &C0 &C1
+  swap2		// &ABC &abc &A1 &B0 &B1 &C0 &C1
+  swap1		// &abc &ABC &A1 &B0 &B1 &C0 &C1
+  // but &ABC is &A0, so we have: [&abc &A0 &A1 &B0 &B1 &C0 &C1], the end as desired
+  // now convert [&abc] to [&a0 &a1 &b0 &b1 &c0 &c1]
+  dup1 240 add	// &c1 &abc
+  swap1		// &abc &c1
+  dup1 192 add	// &c0 &abc &c1
+  swap1		// &abc &c0 &c1
+  dup1 144 add	// &b1 &abc &c0 &c1
+  swap1		// &abc &b1 &c0 &c1
+  dup1 96 add	// &b0 &abc &b1 &c0 &c1
+  swap1		// &abc &b0 &b1 &c0 &c1
+  dup1 48 add	// &a1 &abc &b0 &b1 &c0 &c1
+  swap1		// &abc &a1 &b0 &b1 &c0 &c1
+  // but &abc is &a0, so we have: [&a0 &a1 &b0 &b1 &c0 &c1], as desired
+  // this completes stack preparation, and this will save us lots of work later
+
+  // note: F6M_MUL, F6M_MUL_r0, F6M_MUL_r1, and F6M_MUL_r2 all need a 288-byte temporary memory buffer for aA, bB, cC, each 96 bytes, concatenated
+  //       the start of this buffer will be the constant defined in macro F6M_MUL_BUFFER_AA_BB_CC
+  // F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+0*NUM_BYTES	// &aA0
+  // F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+1*NUM_BYTES	// &aA1
+  // F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+0*NUM_BYTES	// &bB0
+  // F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+1*NUM_BYTES	// &bB1
+  // F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+0*NUM_BYTES	// &cC0
+  // F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+1*NUM_BYTES	// &cC1
+
+  // stack:  &a0 &a1 &b0 &b1 &c0 &c1 &A0 &A1 &B0 &B1 &C0 &C1 &r
+
+  // aA := a * A
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+1*NUM_BYTES>()	// &aA1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*0+0*NUM_BYTES>()	// &aA0
+  dup10		// A1
+  dup10		// A0
+  dup6		// a1
+  dup6		// a0
+  F2M_MUL()
+
+  // bB := b * B
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+1*NUM_BYTES>()	// &bB1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*1+0*NUM_BYTES>()	// &bB0
+  dup12		// B1
+  dup12		// B0
+  dup8		// b1
+  dup8		// b0
+  F2M_MUL()
+
+  // cC := c * C
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+1*NUM_BYTES>()	// &cC1
+  EVAL_ARITHMETIC<F6M_MUL_BUFFER_AA_BB_CC+NUM_BYTES*2*2+0*NUM_BYTES>()	// &cC0
+  dup14		// C1
+  dup14		// C0
+  dup10		// c1
+  dup10		// c0
+  F2M_MUL()
+
+  // the stack is already set up for the following
+  F6M_MUL_r2()
+  F6M_MUL_r1()
+  F6M_MUL_r0()
+
+  // clear stack
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+  pop
+
+}
+
+
+///////////////
+// f6m_mul test
+
+
+#define macro F6M_MUL_TEST_HARDCODED = takes(0) returns(0) {
+
+  // set up memory
+  // a0
+  0x8f2990f3e598f5b1b8f480a3c388306bc023fac151c0104d13ec3aa181599402 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*0>() mstore
+  0x72d1c8c528a1ce3bcaa280a8e735aa0d00000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*0+32>() mstore
+  // a1
+  0x992d7a27906d4cd530b23a7e8c48c0778f8653fbc3332d63db24339d8bc65d7e EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*1>() mstore
+  0xe83b6e91c6550f5aceab102e88e9180900000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*1+32>() mstore
+  // b0
+  0x7299907146816f08c4c6a394e91374ed6ff3618a57358cfb124ee6ab4c560e5c EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*0>() mstore
+  0xac40700b41e2ee8674680728f0c5a61800000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*0+32>() mstore
+  // b1
+  0x0fd77f62b39eb952a0f8d21cec1f93b1d62dd7923aa86882ddf7dd4d3532b0b7 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*1>() mstore
+  0xede8f3fc89fa4a79574067e2d9a9d20000000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*1+32>() mstore
+  // c0
+  0x7a69de46b13d8cb4c4833224aaf9ef7ea6a48975ab35c6e123b8539ab84c381a EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*0>() mstore
+  0x2533401a73c4e79f47d714899d01ac1300000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*0+32>() mstore
+  // c1
+  0xa9fa0b0d8156c36a1a9ddacb73ef278f4d149b560e88789f2bfeb9f708b6cc2f EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*1>() mstore
+  0x988927bfe0186d5bf9cb40cb07f21b1800000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*1+32>() mstore
+  // A0
+  0xecd347c808af644c7a3a971a556576f434e302b6b490004fb418a4a7da330a67 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*0>() mstore
+  0x43adeca931169b8b92e91df73ae1e11500000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*0+32>() mstore
+  // A1
+  0x12a2829e11e843d764d5e3b80e75432d93f69b23ad79c38d43ebbc9bd2b17b9e EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*1>() mstore
+  0x903033351357b03602624762e5ad360d00000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*1+32>() mstore
+  // B0
+  0xd7f9857dce663301f393f9fac66f5c49168494e0d20797a6c4f96327ed4fa47d EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*0>() mstore
+  0xd36d0078d217a712407d35046871d40f00000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*0+32>() mstore
+  // B1
+  0x2f1b767f6c1ec190eb76a0bce7906ad2e4a7548d03e8aa745e34e1bf49d83ad6 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*1>() mstore
+  0x4c04f57fb4d31039cb4cf01987fda21300000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*1+32>() mstore
+  // C0
+  0x7b3f8da2f2ae47885890b0d433a3eeed2f9f37cbcfc444e4f1d880390fcdb765 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*0>() mstore
+  0x18d558857be01b2b10a8010bcdc6d60600000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*0+32>() mstore
+  // C1
+  0x319c02f6132c8a786377868b5825ada9a5fe303e9ae3b03ce56e90734a17ce97 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*1>() mstore
+  0x0c88b321012cf8dabb58211e3d50f61000000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*1+32>() mstore
+
+  // set up stack for call to f6m_mul
+  // input stack: &r &abc &ABC
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  // return output
+  288 F6M_MUL_OUT() return
+
+/*
+output should be:
+f4f3f4e0a35068eaac665aee2e71f682aecd20923b420023b6d5420ba01ea98287c314107a998a650ab3247ef39c920e
+2c9620d993a22bade623d165a9f4aa648af87cb7292b7821c0fcd0adcd14ba655da54df2ad93262e24fc62bcd97e7208
+ead1838e6c5e168543093c87eaeb576f940670026292dcb7a812600f4fb20a281be71ce1ef79f675e4a283b73906ca17
+9c8b2c76405445b20dd7635d562309f69c2c87601d9055a5e10df2ea1d28237fafd0d32f7e8c19d4cd5a3d1ef65b120b
+40591ef0c74dbec983b7bef145a87957c1e09049dbc85fbb3e9bb1174892ee83294ef8c4a5954fffbff4ca6aca74c718
+9b242b8f1c5d63bb525121bd68eda084ab7e6d015052d5adeb79ddb24091d2a8e5b1da00212d0e6c11f01d23790113
+*/
+
+}
+
+
+
+//////////////////
+// f6m_mul bench
+
+#define macro F6M_MUL_BENCH_NUM_ITERS = takes(0) returns(1) {
+  135
+}
+
+#define jumptable F6M_MUL_BENCH_JUMP_TABLE {
+  loop done
+}
+
+#define macro F6M_MUL_BENCH = takes(0) returns(0) {
+
+  // set up memory
+  // a0
+  0x8f2990f3e598f5b1b8f480a3c388306bc023fac151c0104d13ec3aa181599402 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*0>() mstore
+  0x72d1c8c528a1ce3bcaa280a8e735aa0d00000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*0+32>() mstore
+  // a1
+  0x992d7a27906d4cd530b23a7e8c48c0778f8653fbc3332d63db24339d8bc65d7e EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*1>() mstore
+  0xe83b6e91c6550f5aceab102e88e9180900000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*0+NUM_BYTES*1+32>() mstore
+  // b0
+  0x7299907146816f08c4c6a394e91374ed6ff3618a57358cfb124ee6ab4c560e5c EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*0>() mstore
+  0xac40700b41e2ee8674680728f0c5a61800000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*0+32>() mstore
+  // b1
+  0x0fd77f62b39eb952a0f8d21cec1f93b1d62dd7923aa86882ddf7dd4d3532b0b7 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*1>() mstore
+  0xede8f3fc89fa4a79574067e2d9a9d20000000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*1+NUM_BYTES*1+32>() mstore
+  // c0
+  0x7a69de46b13d8cb4c4833224aaf9ef7ea6a48975ab35c6e123b8539ab84c381a EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*0>() mstore
+  0x2533401a73c4e79f47d714899d01ac1300000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*0+32>() mstore
+  // c1
+  0xa9fa0b0d8156c36a1a9ddacb73ef278f4d149b560e88789f2bfeb9f708b6cc2f EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*1>() mstore
+  0x988927bfe0186d5bf9cb40cb07f21b1800000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC0+NUM_BYTES*2*2+NUM_BYTES*1+32>() mstore
+  // A0
+  0xecd347c808af644c7a3a971a556576f434e302b6b490004fb418a4a7da330a67 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*0>() mstore
+  0x43adeca931169b8b92e91df73ae1e11500000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*0+32>() mstore
+  // A1
+  0x12a2829e11e843d764d5e3b80e75432d93f69b23ad79c38d43ebbc9bd2b17b9e EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*1>() mstore
+  0x903033351357b03602624762e5ad360d00000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*0+NUM_BYTES*1+32>() mstore
+  // B0
+  0xd7f9857dce663301f393f9fac66f5c49168494e0d20797a6c4f96327ed4fa47d EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*0>() mstore
+  0xd36d0078d217a712407d35046871d40f00000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*0+32>() mstore
+  // B1
+  0x2f1b767f6c1ec190eb76a0bce7906ad2e4a7548d03e8aa745e34e1bf49d83ad6 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*1>() mstore
+  0x4c04f57fb4d31039cb4cf01987fda21300000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*1+NUM_BYTES*1+32>() mstore
+  // C0
+  0x7b3f8da2f2ae47885890b0d433a3eeed2f9f37cbcfc444e4f1d880390fcdb765 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*0>() mstore
+  0x18d558857be01b2b10a8010bcdc6d60600000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*0+32>() mstore
+  // C1
+  0x319c02f6132c8a786377868b5825ada9a5fe303e9ae3b03ce56e90734a17ce97 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*1>() mstore
+  0x0c88b321012cf8dabb58211e3d50f61000000000000000000000000000000000 EVAL_ARITHMETIC<F6_ABC+NUM_BYTES*2*2+NUM_BYTES*1+32>() mstore
+
+
+  // prepare for loop
+  1     // iterator, starts at 1 and grows
+
+loop:
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+  
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  // set up stack for call to f6m_mul
+  F6_ABC()		// ABC
+  F6_ABC0()		// abc
+  F6M_MUL_OUT()		// out
+  F6M_MUL()
+
+  __tablesize(F6M_MUL_BENCH_JUMP_TABLE) __tablestart(F6M_MUL_BENCH_JUMP_TABLE) 3000 codecopy    // copy jumpdests to memory offset 3000
+  1 add                                 // increment                            [iterator+1]
+  dup1 F6M_MUL_BENCH_NUM_ITERS() lt     // compare to max number of iters       [iterator+1 0_or_1]
+  32 mul 3000 add       // offset to jump to                                    [iterator+1 1000_or_1032]
+  mload jump    // where the number before lt is iter_count
+
+done:
+  0xff 0 mstore8 1 0 return     // return a single byte, 0xff, to make sure it executed this far
+  //stop
+
+}
+
+
+///////////////
+// f2m_mul test
+
+#define macro F2M_MUL_TEST_HARDCODED = takes(0) returns(0) {
+  // set up memory
+  // x0
+  0x8f2990f3e598f5b1b8f480a3c388306bc023fac151c0104d13ec3aa181599402
+  100
+  mstore
+  0x72d1c8c528a1ce3bcaa280a8e735aa0d00000000000000000000000000000000
+  132
+  mstore
+  // x1
+  0x992d7a27906d4cd530b23a7e8c48c0778f8653fbc3332d63db24339d8bc65d7e
+  148
+  mstore
+  0xe83b6e91c6550f5aceab102e88e9180900000000000000000000000000000000
+  180
+  mstore
+  //y0
+  0xecd347c808af644c7a3a971a556576f434e302b6b490004fb418a4a7da330a67
+  200
+  mstore
+  0x43adeca931169b8b92e91df73ae1e11500000000000000000000000000000000
+  232
+  mstore
+  //y1
+  0x12a2829e11e843d764d5e3b80e75432d93f69b23ad79c38d43ebbc9bd2b17b9e
+  248
+  mstore
+  0x903033351357b03602624762e5ad360d00000000000000000000000000000000
+  280
+  mstore
+  // mod for bls12-381
+  0xabaafffffffffeb9ffff53b1feffab1e24f6b0f6a0d23067bf1285f3844b7764
+  500
+  mstore
+  0xd7ac4b43b6a71b4b9ae67f39ea11011a00000000000000000000000000000000
+  532
+  mstore
+  // inv for bls12-381
+  0x89f3fffcfffcfffd000000000000000000000000000000000000000000000000
+  548
+  mstore
+
+  // set up stack for f2m_mul
+  0x89f3fffcfffcfffd    // inv
+  500                   // mod
+  48                    // out1
+  0                     // out0
+  248                   // y1
+  200                   // y0
+  148                   // x1
+  100                   // x0
+  F2M_MUL()
+
+  // return output
+  96 0 return
+
+}
+
+
+
+
+////////////////
+// f2m_mul bench
+
+#define macro F2M_MUL_BENCH_NUM_ITERS = takes(0) returns(1) {
+  135
+}
+
+#define jumptable F2M_MUL_BENCH_JUMP_TABLE {
+  loop done
+}
+
+#define macro F2M_MUL_BENCH = takes(0) returns(0) {
+
+  // set up memory
+  // x0
+  0x8f2990f3e598f5b1b8f480a3c388306bc023fac151c0104d13ec3aa181599402
+  100
+  mstore
+  0x72d1c8c528a1ce3bcaa280a8e735aa0d00000000000000000000000000000000
+  132
+  mstore
+  // x1
+  0x992d7a27906d4cd530b23a7e8c48c0778f8653fbc3332d63db24339d8bc65d7e
+  148
+  mstore
+  0xe83b6e91c6550f5aceab102e88e9180900000000000000000000000000000000
+  180
+  mstore
+  //y0
+  0xecd347c808af644c7a3a971a556576f434e302b6b490004fb418a4a7da330a67
+  200
+  mstore
+  0x43adeca931169b8b92e91df73ae1e11500000000000000000000000000000000
+  232
+  mstore
+  //y1
+  0x12a2829e11e843d764d5e3b80e75432d93f69b23ad79c38d43ebbc9bd2b17b9e
+  248
+  mstore
+  0x903033351357b03602624762e5ad360d00000000000000000000000000000000
+  280
+  mstore
+  // mod for bls12-381
+  0xabaafffffffffeb9ffff53b1feffab1e24f6b0f6a0d23067bf1285f3844b7764
+  500
+  mstore
+  0xd7ac4b43b6a71b4b9ae67f39ea11011a00000000000000000000000000000000
+  532
+  mstore
+  // inv for bls12-381
+  0x89f3fffcfffcfffd000000000000000000000000000000000000000000000000
+  548
+  mstore
+
+  1     // iterator, starts at 1 and grows
+
+loop:
+  // set up stack for f2m_mul
+  0x89f3fffcfffcfffd    // inv
+  500                   // mod
+  48                    // out1
+  0                     // out0
+  248                   // y1
+  200                   // y0
+  148                   // x1
+  100                   // x0
+  F2M_MUL()
+
+  // set up stack for f2m_mul
+  0x89f3fffcfffcfffd    // inv
+  500                   // mod
+  48                    // out1
+  0                     // out0
+  248                   // y1
+  200                   // y0
+  148                   // x1
+  100                   // x0
+  F2M_MUL()
+
+  
+  __tablesize(F6M_MUL_BENCH_JUMP_TABLE) __tablestart(F6M_MUL_BENCH_JUMP_TABLE) 3000 codecopy    // copy jumpdests to memory offset 3000
+  1 add                                 // increment                            [iterator+1]
+  dup1 F2M_MUL_BENCH_NUM_ITERS() lt     // compare to max number of iters       [iterator+1 0_or_1]
+  32 mul 3000 add       // offset to jump to                                    [iterator+1 1000_or_1032]
+  mload jump    // where the number before lt is iter_count
+
+done:
+  0xff 0 mstore8 1 0 return     // return a single byte, 0xff, to make sure it executed this far
+  //stop
+
+}
+

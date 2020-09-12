@@ -7,7 +7,7 @@ const parser = require('./huff/src/parser');
 const pathToData = path.posix.resolve(__dirname, './');
 
 //const { inputMap, macros, jumptables } = parser.parseFile('f2m_mul.huff', pathToData);
-const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul.huff', pathToData);
+const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v4.huff', pathToData);
 
 const {
     data: { bytecode: macroCode },
