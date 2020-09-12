@@ -617,7 +617,7 @@ ead1838e6c5e168543093c87eaeb576f940670026292dcb7a812600f4fb20a281be71ce1ef79f675
 // f6m_mul bench
 
 #define macro F6M_MUL_BENCH_NUM_ITERS = takes(0) returns(1) {
-  135
+  1350
 }
 
 #define jumptable F6M_MUL_BENCH_JUMP_TABLE {
@@ -914,14 +914,16 @@ loop:
   F2M_MUL()
 
   
-  __tablesize(F2M_MUL_BENCH_JUMP_TABLE) __tablestart(F2M_MUL_BENCH_JUMP_TABLE) 1000 codecopy	// copy jumpdests to memory offset 1000
-  1 add					// increment				[iterator+1]
-  dup1 F2M_MUL_BENCH_NUM_ITERS() lt	// compare to max number of iters	[iterator+1 0_or_1]
-  32 mul 1000 add 	// offset to jump to					[iterator+1 1000_or_1032]
+  __tablesize(F6M_MUL_BENCH_JUMP_TABLE) __tablestart(F6M_MUL_BENCH_JUMP_TABLE) 1000 codecopy    // copy jumpdests to memory offset 1000
+  1 add                                 // increment                            [iterator+1]
+  dup1 F6M_MUL_BENCH_NUM_ITERS() lt     // compare to max number of iters       [iterator+1 0_or_1]
+  32 mul 1000 add       // offset to jump to                                    [iterator+1 3000_or_3032]
   mload jump    // where the number before lt is iter_count
 
 done:
-  stop
+  0xff 0 mstore8 1 0 return     // return a single byte, 0xff, to make sure it executed this far
+  //stop
+
 
 }
 
