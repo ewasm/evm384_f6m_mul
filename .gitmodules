@@ -28,3 +28,6 @@
 [submodule "deps/v5/evmone"]
 	path = deps/v5/evmone
 	url = https://github.com/jwasinger/evmone
+[submodule "deps/v6/evmone"]
+	path = deps/v6/evmone
+	url = https://github.com/jwasinger/evmone
