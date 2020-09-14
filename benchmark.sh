@@ -10,6 +10,7 @@ set -e
 # incorrect result
 ./deps/v5/evmone/build/bin/evmone-bench --benchmark_format=json --benchmark_color=false --benchmark_min_time=5 build/v5-f6m_mul_bench.hex 00 3eb4cfbedd75a21a29701b4f4672232c52318353acdeef6d435d19a2681e023d153b8d400893da3b1525258aa820610e00000000000000000000000000000000 | python3 catch_evmone_bench_err.py
 
+./deps/v4/evmone/build/bin/evmone-bench --benchmark_format=json --benchmark_color=false --benchmark_min_time=5 build/v4-huff-f6m_mul_bench.hex 00 ff | python3 catch_evmone_bench_err.py
 ./deps/v6/evmone/build/bin/evmone-bench --benchmark_format=json --benchmark_color=false --benchmark_min_time=5 build/v6-f6m_mul_bench.hex 00 ff | python3 catch_evmone_bench_err.py
 
 # TODO fix stock v2 huff implementation of f6m_mul
