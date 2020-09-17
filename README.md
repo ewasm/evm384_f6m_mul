@@ -6,16 +6,11 @@ Currently the only example/benchmark is multiplication of two "F6" points, eleme
 
 ## Usage
 
-### Build dependencies:
+### Benchmark latest V6/V7 implementations using evmone-bench
+
 ```
 git submodule update --init --recursive
-(cd evmone && mkdir build && cd build && cmake .. && make -j4)
-(cd evmc && mkdir build && cd build && cmake -DEVMC_TOOLS=ON .. && make -j4)
-(cd solidity && mkdir build && cd build && cmake .. && make -j4)
+(cd deps/v6/evmone && mkdir build && cd build && cmake -DEVMONE_TESTING=ON .. && make -j4)
+(cd deps/v7/evmone && mkdir build && cd build && cmake -DEVMONE_TESTING=ON .. && make -j4)
+make benchmark
 ```
-
-### Build benchmark and unit test:
-`make` which stores bytecode under `build` folder
-
-### Build CircleCI Docker Image
-`make circleci_build_image`

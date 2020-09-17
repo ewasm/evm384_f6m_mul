@@ -1,7 +1,5 @@
-all: clean build
-build: build_dir v1 v2 v4 v3 v5 
-build_dir:
-	mkdir build
+all: build
+build: v1 v2 v4 v3 v5
 
 v3:
 	./deps/v2/solidity/build/solc/solc --strict-assembly --optimize src/v3/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v3-f6m_mul_bench.hex
@@ -22,5 +20,3 @@ benchmark:
 
 circleci_build_image:
 	docker build -t jwasinger/evm384 -f .circleci/Dockerfile .
-clean:
-	rm -rf build
