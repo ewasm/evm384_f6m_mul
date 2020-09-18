@@ -1,22 +1,23 @@
 # Files
 
 ```
-f6m_mul_v2.huff	        huff source code using interface v2
-f6m_mul_v4.huff	        huff source code using interface v4
-f6m_mul_v6.huff         huff source code using interface v6
-f6m_mul_v7.huff         huff source code using interface v7
+f6m_mul_v2.huff	        huff source code using interface v2.
+f6m_mul_v4.huff	        huff source code using interface v4.
+f6m_mul_v6.huff         huff source code using interface v6.
+f6m_mul_v7.huff         huff source code using interface v7.
 
-f6m_mul_v2.json         Ethereum test file with v2 test bytecode under the field "code"
-f6m_mul_v4.json	        Ethereum test file with v4 test bytecode under the field "code"
-f6m_mul_v6.json         Ethereum test file with v6 test bytecode under the field "code"
-f6m_mul_v7.json         Ethereum test file with v7 test bytecode under the field "code"
+f6m_mul_v2.json         Ethereum test file with v2 test bytecode under the field "code".
+f6m_mul_v4.json	        Ethereum test file with v4 test bytecode under the field "code".
+f6m_mul_v6.json         Ethereum test file with v6 test bytecode under the field "code".
+f6m_mul_v7.json         Ethereum test file with v7 test bytecode under the field "code".
 
-f6m_mul_v2_bench.json   Ethereum test file with v2 benchmark bytecode under the field "code"
-f6m_mul_v4_bench.json   Ethereum test file with v4 benchmark bytecode under the field "code"
-f6m_mul_v6_bench.json   Ethereum test file with v6 benchmark bytecode under the field "code"
-f6m_mul_v7_bench.json   Ethereum test file with v7 benchmark bytecode under the field "code"
+f6m_mul_v2_bench.json   Ethereum test file with v2 benchmark bytecode under the field "code".
+f6m_mul_v4_bench.json   Ethereum test file with v4 benchmark bytecode under the field "code".
+f6m_mul_v6_bench.json   Ethereum test file with v6 benchmark bytecode under the field "code".
+f6m_mul_v7_bench.json   Ethereum test file with v7 benchmark bytecode under the field "code".
 
-huff.patch              patch to tell huff how to handle evm384 opcodes
+compile.js              Compiler interface to huff.
+huff.patch              Patch to tell huff how to handle evm384 opcodes.
 ```
 
 # Compile
