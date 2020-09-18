@@ -42,7 +42,8 @@ template<val>
 
 
 /*
-registers are
+Convention: memory is set up as follows
+<idx> <variable>, where <idx> is the memory location divided by 48 (i.e. the idx'th 48-byte chunk), and <variable> is the variable name
 00 zero
 01 a0
 02 a1
@@ -84,7 +85,7 @@ registers are
 // this is the main macro for f6m_mul
 #define macro F6M_MUL = takes(0) returns(0) {
 
-// set up aA, bB, and cC
+// first precompute aA, bB, and cC, which we will reuse
 // f2m_mul aA = a * A
 0x000004b0000000300000015000000660 mulmodmont384			// tmp1 = x0*y0
 0x000004e0000000600000018000000660 mulmodmont384			// tmp2 = x1*y1
@@ -115,6 +116,8 @@ registers are
 0x00000510000002100000024000000660 addmod384			// tmp3 = y0+y1
 0x000004e0000004e00000051000000660 mulmodmont384		// tmp2 = tmp2*tmp3
 0x00000360000004e0000004b000000660 submod384		// out1 = tmp2-tmp1
+
+// next compute each of the three output f2 points, which are together an f6 point
 
 // F6M_MUL_R2
 // f2m_add tmp1 = a + c
@@ -204,7 +207,7 @@ registers are
 0x00000570000002a00000048000000660 addmod384	
 
 /*
-// pseudo-code for f6m_mul
+// more concisely, the above takes input f6 points abc and ABC, and outputs f6 point r. In other words, it inputs six f2 points, a, b, c, A, B, C, and ouputs three f2 points r0, r1, r2. And each f2 point is two f1 points. And an f1 point is a 48-bit integer.
 
 // set up aA, bB, and cC
 f2m_mul aA = a * A
@@ -316,7 +319,7 @@ ead1838e6c5e168543093c87eaeb576f940670026292dcb7a812600f4fb20a281be71ce1ef79f675
 
 
 ///////////////
-// f6m_mul_registers benchmark
+// f6m_mul benchmark
 
 #define macro F6M_MUL_BENCH_NUM_ITERS = takes(0) returns(1) {
   135
