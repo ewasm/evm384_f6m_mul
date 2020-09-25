@@ -5,7 +5,7 @@ build_dir:
 
 v8:
 	node src/v8/compile.js | sed 's/^.\{2\}//' > build/v8-f6m_mul_bench.hex 
-v8:
+v7:
 	node src/v7/compile.js | sed 's/^.\{2\}//' > build/v7-f6m_mul_bench.hex 
 v3:
 	./deps/v2/solidity/build/solc/solc --strict-assembly --optimize src/v3/benchmark.yul | awk '/Binary representation:/ { getline; print $0 }' | grep . > build/v3-f6m_mul_bench.hex

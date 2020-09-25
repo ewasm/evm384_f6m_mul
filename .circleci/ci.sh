@@ -23,6 +23,10 @@ cd /root/project && git submodule update --init --recursive
 	mkdir build && \
 	cd build && cmake -DEVMONE_TESTING=ON .. && make -j4)
 
+(cd /root/project/deps/v8/evmone && \
+	mkdir build && \
+	cd build && cmake -DEVMONE_TESTING=ON .. && make -j4)
+
 mkdir -p /root/project/deps/v4/solidity/build/solc
 mkdir -p /root/project/deps/v2/solidity/build/solc
 mkdir -p /root/project/deps/v1/solidity/build/solc
