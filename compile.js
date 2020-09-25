@@ -10,7 +10,9 @@ const pathToData = path.posix.resolve(__dirname, './');
 
 //const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v2.huff', pathToData);
 //const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v4.huff', pathToData);
-const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v6.huff', pathToData);
+//const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v6.huff', pathToData);
+//const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v7.huff', pathToData);
+const { inputMap, macros, jumptables } = parser.parseFile('f6m_mul_v8.huff', pathToData);
 
 const {
     data: { bytecode: macroCode },
