@@ -1,0 +1,39 @@
+[submodule "evmc"]
+	path = deps/evmc
+	url = https://github.com/ethereum/evmc
+[submodule "evmone-v1"]
+	path = deps/v1/evmone
+	url = https://github.com/axic/evmone
+[submodule "evmone-v2"]
+	path = deps/v2/evmone
+	url = https://github.com/ethereum/evmone
+[submodule "solidity-v2"]
+	path = deps/v2/solidity
+	url = https://github.com/ethereum/solidity
+[submodule "solidity-v1"]
+	path = deps/v1/solidity
+	url = https://github.com/ethereum/solidity
+[submodule "deps/evmc"]
+	path = deps/evmc
+	url = https://github.com/ethereum/evmc
+[submodule "deps/v4/evmone"]
+	path = deps/v4/evmone
+	url = https://github.com/jwasinger/evmone
+[submodule "deps/v4/solidity"]
+	path = deps/v4/solidity
+	url = https://github.com/jwasinger/solidity
+[submodule "deps/v3/evmone"]
+	path = deps/v3/evmone
+	url = https://github.com/ethereum/evmone
+[submodule "deps/v5/evmone"]
+	path = deps/v5/evmone
+	url = https://github.com/jwasinger/evmone
+[submodule "deps/v6/evmone"]
+	path = deps/v6/evmone
+	url = https://github.com/jwasinger/evmone
+[submodule "deps/v7/evmone"]
+	path = deps/v7/evmone
+	url = https://github.com/jwasinger/evmone
+[submodule "deps/v8/evmone"]
+	path = deps/v8/evmone
+	url = https://github.com/jwasinger/evmone
