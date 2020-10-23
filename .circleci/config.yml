@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: jwasinger/evm384
+    steps:
+      - checkout
+      - run:
+          name: stuff
+          command: bash .circleci/ci.sh
+          working_directory: /root/project
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
