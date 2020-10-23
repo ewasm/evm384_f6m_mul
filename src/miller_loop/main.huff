@@ -1,0 +1,130 @@
+
+#include "miller_loop.huff"
+
+// this is a dummy macro which lets me evaluate arithmetic at compile-time
+template<val>
+#define macro EVAL_ARITHMETIC = takes(0) returns(1) {
+  <val>
+}
+
+
+
+///////////////
+// test
+
+#define macro MILLER_LOOP_TEST_HARDCODED = takes(0) returns(0) {
+
+  // set up memory
+
+// test from https://tools.ietf.org/id/draft-yonezawa-pairing-friendly-curves-02.html#rfc.appendix.B
+/*
+  0xbbc622db0af03afbef1a7af93fe8556c58ac1b173f3a4ea105b974974f8c68c3 0x2528 mstore
+  0x0faca94f8c63952694d79731a7d3f117e1e7c5462923aa0ce48a88a244c73cd0 0x2548 mstore
+  0xedb3042ccb18db00f60ad0d595e0f5fce48a1d74ed309ea0f1a0aae381f4b308 0x2568 mstore
+  0xb8bd21c1c85680d4efbb05a82603ac0b77d1e37a640b51b4023b40fad47ae4c6 0x2588 mstore
+  0x5110c52d27050826910a8ff0b2a24a027e2b045d057dace5575d941312f14c33 0x25a8 mstore
+  0x49507fdcbb61dab51ab62099d0d06b59654f2788a0d3ac7d609f7152602be013 0x25c8 mstore
+  0x0128b808865493e189a2ac3bccc93a922cd16051699a426da7d3bd8caa9bfdad 0x25e8 mstore
+  0x1a352edac6cdc98c116e7d7227d5e50cbe795ff05f07a9aaa11dec5c270d373f 0x2608 mstore
+  0xab992e57ab927426af63a7857e283ecb998bc22bb0d2ac32cc34a72ea0c40606 0x2628 mstore
+*/
+
+/*
+// neg of group identities found in blst
+0x160c53fd9087b35cf5ff769967fc1778c1a13b14c7954f1547e7d0f3cd6aaef0 0x2528 mstore
+0x40f4db21cc6eceed75fb0b9e417701123a8818f32a6c52ff70023b38e49c8992 0x2548 mstore
+0x55d0a99f8d73d7892ac144a35bf3ca1217534b96761bff3c304477e9edd2440e 0x2568 mstore
+0x100a9402a28ff2f51a96b48726fbf5b380e52a3eb593a8a1e9ae3c1a9d999498 0x2588 mstore
+0x6b36631863b7676fd7bc50439291810506f6239e75c0a9a5c360cdbc9dc5a0aa 0x25a8 mstore
+0x067886e2187eb13b67b34185ccb61a1b478515f20eedb6c2f3ed6073092a9211 0x25c8 mstore
+0x615eb69f07f58b6da5631d53df052fc5c992a64c344d4a7f5fc977859b9587a8 0x25e8 mstore
+0x34875c5240fe4743b50bffba5b147d194efa9a206d033e0c239e3f86f4d80106 0x2608 mstore
+0x840accba362683e0846f472a36ef2debe9e10e9f654f0464a7caa1d5484fd50e 0x2628 mstore
+*/
+
+/*
+// group identities
+0xefe91bb26eb1b9ea4e39cdff121548d55ccb37bdc8828218bb419daa2c1e9585 0x2528 mstore
+0x54ff87bf2562fcc8670a74fede488800a68e9c5555de82fd1a59a934363dfec2 0x2548 mstore
+0x0523b84fd42a186dd9523eca48b37fbdc4eeaf305d4f671fff2e10c5694a9101 0x2568 mstore
+0x9651007c8fe4e374025453bb529f88719b6bdb57f501a57e31503e2071f065c5 0x2588 mstore
+0x011d84a3a23096c8fe85c771be808401fe6aa16efafe6bb2e66ff7bf8499f85c 0x25a8 mstore
+0xdec99907ce3e22e7cbce5166ee772753d540b1b1515adc70314000e74060ea00 0x25c8 mstore
+0xdf4dfd09440994f02e7c8c6d8888cff204d232f882c258e4589ab47472ed03de 0x25e8 mstore
+0xb4efb2cb6b7360d97b6f445d660d6900938feb85d1cda1d90b27525e3fb87942 0x2608 mstore
+0xc204e3ce1ab06324f11b593dac11ef61aa701a15a39d549e185583d29f16f800 0x2628 mstore
+*/
+
+/*
+// wasmsnark test
+0xedae919853b05e124b0df9d0eb00bb861ce4007fb66a592b5b010403b043dc81 0x2528 mstore
+0x7a0761ddbeef7f574bc8f1ec25da810f199ebd34b2dee439b771301cd36f80cd 0x2548 mstore
+0x8131b0471cfdf71d6c994711f63a9a20fe43b77778e36c6d9186ec919562af11 0x2568 mstore
+0xb8bd21c1c85680d4efbb05a82603ac0b77d1e37a640b51b4023b40fad47ae4c6 0x2588 mstore
+0x5110c52d27050826910a8ff0b2a24a027e2b045d057dace5575d941312f14c33 0x25a8 mstore
+0x49507fdcbb61dab51ab62099d0d06b59654f2788a0d3ac7d609f7152602be013 0x25c8 mstore
+0x0128b808865493e189a2ac3bccc93a922cd16051699a426da7d3bd8caa9bfdad 0x25e8 mstore
+0x1a352edac6cdc98c116e7d7227d5e50cbe795ff05f07a9aaa11dec5c270d373f 0x2608 mstore
+0xab992e57ab927426af63a7857e283ecb998bc22bb0d2ac32cc34a72ea0c40606 0x2628 mstore
+*/
+
+// from casey
+0x2eeab68a7e81265049f5f0605bdb1d707c989dc00254130aa22758bac03cbb5f 0x2528 mstore
+0x76f19e747d605a66b7fa20b1efdf830b17a7236d48a48d2fab02816bec4804c3 0x2548 mstore
+0xbb34ed3abffb5c373c63a2d1e53a9d0ba396e336b4ed963e173d4962532ec815 0x2568 mstore
+0xa7be8e258958f53b5fd7f0e8c38cacea938777a70fb434a47d590358ff328f16 0x2588 mstore
+0xee904327d5a5974ef301ebf77f2ffc168d9da6ddf1097969954b3a5be0954bb8 0x25a8 mstore
+0x696507d68260a6ec027d20f9b880302e7988ec59a7c5dfefa42147b8f5a53a18 0x25c8 mstore
+0x91ad9e2ed61db2570c0d87927f83522f15642c0c0b5fddaf0df7decea0a04a7b 0x25e8 mstore
+0x476eaae313ae06548de9039b805c2e004daed96f5ef313e05f4b61fdd6e77f8e 0x2608 mstore
+0x7587eef59d2cd050b7a75107ede17f814398664e2bf6607c7d733f02bbc39d03 0x2628 mstore
+
+
+  // call miller loop over above memory
+  MILLER_LOOP()
+
+  0xff 0 mstore8 1 0 return	// return a single byte, 0xff, to make sure it executed this far
+}
+
+
+///////////////
+// benchmark
+
+#define macro BENCH_NUM_ITERS = takes(0) returns(1) {
+  135
+}
+
+#define jumptable BENCH_JUMP_TABLE {
+  loop done
+}
+
+#define macro MILLER_LOOP_BENCH = takes(0) returns(0) {
+
+  // set up memory
+// wasmsnark test
+0xedae919853b05e124b0df9d0eb00bb861ce4007fb66a592b5b010403b043dc81 0x2528 mstore
+0x7a0761ddbeef7f574bc8f1ec25da810f199ebd34b2dee439b771301cd36f80cd 0x2548 mstore
+0x8131b0471cfdf71d6c994711f63a9a20fe43b77778e36c6d9186ec919562af11 0x2568 mstore
+0xb8bd21c1c85680d4efbb05a82603ac0b77d1e37a640b51b4023b40fad47ae4c6 0x2588 mstore
+0x5110c52d27050826910a8ff0b2a24a027e2b045d057dace5575d941312f14c33 0x25a8 mstore
+0x49507fdcbb61dab51ab62099d0d06b59654f2788a0d3ac7d609f7152602be013 0x25c8 mstore
+0x0128b808865493e189a2ac3bccc93a922cd16051699a426da7d3bd8caa9bfdad 0x25e8 mstore
+0x1a352edac6cdc98c116e7d7227d5e50cbe795ff05f07a9aaa11dec5c270d373f 0x2608 mstore
+0xab992e57ab927426af63a7857e283ecb998bc22bb0d2ac32cc34a72ea0c40606 0x2628 mstore
+
+
+
+  0x0	// loop_variable starts at 0
+  
+bench_loop:
+  MILLER_LOOP()
+
+  0x1 add	   // increment loop_variable
+  dup1 0x3 gt      // check if loop_variable is less than the const on this line
+  bench_loop jumpi // conditional jump if above conditional is true
+
+  0xff 0 mstore8 1 0 return	// return a single byte, 0xff, to make sure it executed this far
+  //stop
+
+}
+
