@@ -4,6 +4,8 @@
 # Note: gas costs calculated here are off of evmone by like 21 gas, very small error
 
 # function from yellowpaper to give gas cost for memory growth
+
+
 def Cmem(memsize):
   a = (memsize+32)//32
   return 3*a+(a**2)//512
@@ -12,7 +14,7 @@ opcode_costs = {
  'PUSH': 3, 
  'ADDMOD384': 2, 
  'SUBMOD384': 2, 
- 'MULMODMONT384': 5,
+ 'MULMODMONT384': 6,
  'MSTORE': 3, 
  'MLOAD': 3, 
  'JUMPDEST': 1, 
@@ -48,13 +50,11 @@ def gas_cost(memory_length, opcode_counts, opcode_costs, no_PUSH16_flag, miller_
   gas_cost=0
   gas_cost+=Cmem(memory_length)
   if miller_or_finalexp_flag:
-    calldata_length_miller_loop = 288
-    calldata_cost_miller_loop = calldata_length_miller_loop//32 + 0 if calldata_length_miller_loop%32 else 1
-    gas_cost+=calldata_cost_miller_loop
+    calldata_length = 288
   else:
-    calldata_length_final_exponentiation = 576
-    calldata_cost_final_exponentiation = calldata_length_final_exponentiation//32 + 0 if calldata_length_final_exponentiation%32 else 1
-    gas_cost+=calldata_cost_final_exponentiation
+    calldata_length = 576
+  calldatacopy_cost = calldata_length//32 + (0 if calldata_length%32 else 1)
+  gas_cost+=calldatacopy_cost*3
   for op in opcode_counts:
     if op[:3]=='DUP':
       gas_cost+=opcode_costs['DUP']*opcode_counts[op]
@@ -69,9 +69,6 @@ def gas_cost(memory_length, opcode_counts, opcode_costs, no_PUSH16_flag, miller_
       gas_cost+=opcode_costs[op]*opcode_counts[op]
   return int(gas_cost)
 
-
-###################
-# MILLER LOOP COSTS
 
 memory_length_miller_loop_f2mulv3=15712
 opcode_counts_miller_loop_f2mulv3={'PUSH16': 30835, 'ADDMOD384': 12182, 'SUBMOD384': 11786, 'MULMODMONT384': 6867, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1, 'other': 0}
@@ -97,9 +94,6 @@ data.update({
 for k in sorted(data, key=data.get, reverse=False):
   print(k, data[k])
 
-  
-#################
-# FINAL EXP COSTS
 
 memory_length_final_exp_f2mulv3=15424
 opcode_counts_final_exp_f2mulv3={'PUSH16': 45988, 'ADDMOD384': 24370, 'SUBMOD384': 13867, 'MULMODMONT384': 8196, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1, 'other': 0}
@@ -121,6 +115,7 @@ data.update({
  "v9\\\\_final\\\\_exp\\\\_f2mulv4": gas_cost(memory_length_final_exp_f2mulv4,opcode_counts_final_exp_f2mulv4,opcode_costs,1,0),
  "v9\\\\_final\\\\_exp\\\\_f2mulv4\\\\_potential": gas_cost(memory_length_final_exp_f2mulv4,opcode_counts_final_exp_f2mulv4,opcode_costs_potential,1,0),
   })
+
 
 for k in sorted(data, key=data.get, reverse=False):
   print(k, data[k])
