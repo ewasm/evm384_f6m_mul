@@ -14,7 +14,7 @@ v7\\_final\\_exp\\_f2mulv3 314462
 EOD
 
 set term png nocrop enhanced font "verdana,8"
-set output "gascost.png"
+set output "figure4.png"
 set nokey
 set boxwidth 0.5
 set style fill solid
