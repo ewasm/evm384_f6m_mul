@@ -1,15 +1,21 @@
-# Gas costs for miller loop on evm384-v7/v9 and f2mul_v3/v4
+# Future gas costs for miller loop on evm384-v7/v9 and f2mul_v3/v4
 # Based on miller_loop_v3.hex and miller_loop_v4.hex
 
 $data << EOD
+v9\\_miller\\_loop\\_f2mul\\_v3\\_fractional 80678
+v9\\_miller\\_loop\\_f2mul\\_v4\\_fractional 80678
 v9\\_miller\\_loop\\_f2mul\\_v4 104973
+v7\\_miller\\_loop\\_f2mul\\_v4\\_fractional 105101
 v9\\_miller\\_loop\\_f2mul\\_v3 106822
+v7\\_miller\\_loop\\_f2mul\\_v3\\_fractional 108429
+v7\\_miller\\_loop\\_f2mul\\_v4\\_potential 124838
+v7\\_miller\\_loop\\_f2mul\\_v3\\_potential 130385
 v7\\_miller\\_loop\\_f2mul\\_v4 186384
 v7\\_miller\\_loop\\_f2mul\\_v3 199327
 EOD
 
 set term png nocrop enhanced font "verdana,8"
-set output "figure3.png"
+set output "figure5.png"
 set nokey
 set boxwidth 0.5
 set style fill solid
