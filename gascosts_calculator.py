@@ -29,8 +29,8 @@ opcode_costs = {
  'SWAP': 3,
  'POP': 2, 
  'CALLDATACOPY': 3,
- 'RETURN': 0,
- 'other': 0}
+ 'RETURN': 0
+}
 
 # gas costs with PUSH costing 2 gas
 opcode_costs_PUSH2 = {key: value for key, value in opcode_costs.items()}
@@ -71,7 +71,7 @@ def gas_cost(memory_length, opcode_counts, opcode_costs, no_PUSH16_flag, miller_
 
 
 memory_length_miller_loop_f2mulv3=15712
-opcode_counts_miller_loop_f2mulv3={'PUSH16': 30835, 'ADDMOD384': 12182, 'SUBMOD384': 11786, 'MULMODMONT384': 6867, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1, 'other': 0}
+opcode_counts_miller_loop_f2mulv3={'PUSH16': 30835, 'ADDMOD384': 12182, 'SUBMOD384': 11786, 'MULMODMONT384': 6867, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1}
 data = {}
 data.update({
  "v7\\\\_miller\\\\_loop\\\\_f2mulv3": gas_cost(memory_length_miller_loop_f2mulv3,opcode_counts_miller_loop_f2mulv3,opcode_costs,0,1),
@@ -82,7 +82,7 @@ data.update({
  })
 
 memory_length_miller_loop_f2mulv4=15712
-opcode_counts_miller_loop_f2mulv4={'PUSH16': 27137, 'ADDMOD384': 10333, 'MULMODMONT384': 8716, 'SUBMOD384': 8088, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1, 'other': 0}
+opcode_counts_miller_loop_f2mulv4={'PUSH16': 27137, 'ADDMOD384': 10333, 'MULMODMONT384': 8716, 'SUBMOD384': 8088, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1}
 data.update({
  "v7\\\\_miller\\\\_loop\\\\_f2mulv4": gas_cost(memory_length_miller_loop_f2mulv4,opcode_counts_miller_loop_f2mulv4,opcode_costs,0,1),
  "v7\\\\_miller\\\\_loop\\\\_f2mulv4\\\\_PUSH2": gas_cost(memory_length_miller_loop_f2mulv4,opcode_counts_miller_loop_f2mulv4,opcode_costs_PUSH2,0,1),
@@ -96,7 +96,7 @@ for k in sorted(data, key=data.get, reverse=False):
 
 
 memory_length_final_exp_f2mulv3=15424
-opcode_counts_final_exp_f2mulv3={'PUSH16': 45988, 'ADDMOD384': 24370, 'SUBMOD384': 13867, 'MULMODMONT384': 8196, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1, 'other': 0}
+opcode_counts_final_exp_f2mulv3={'PUSH16': 45988, 'ADDMOD384': 24370, 'SUBMOD384': 13867, 'MULMODMONT384': 8196, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1}
 data = {}
 data.update({
  "v7\\\\_final\\\\_exp\\\\_f2mulv3": gas_cost(memory_length_final_exp_f2mulv3,opcode_counts_final_exp_f2mulv3,opcode_costs,0,0),
@@ -107,7 +107,7 @@ data.update({
   })
 
 memory_length_final_exp_f2mulv4=15424
-opcode_counts_final_exp_f2mulv4={'PUSH16': 44638, 'ADDMOD384': 23695, 'SUBMOD384': 12517, 'MULMODMONT384': 8871, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1, 'other': 0}
+opcode_counts_final_exp_f2mulv4={'PUSH16': 44638, 'ADDMOD384': 23695, 'SUBMOD384': 12517, 'MULMODMONT384': 8871, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1}
 data.update({
  "v7\\\\_final\\\\_exp\\\\_f2mulv4": gas_cost(memory_length_final_exp_f2mulv4,opcode_counts_final_exp_f2mulv4,opcode_costs,0,0),
  "v7\\\\_final\\\\_exp\\\\_f2mulv4\\\\_PUSH2": gas_cost(memory_length_final_exp_f2mulv4,opcode_counts_final_exp_f2mulv4,opcode_costs_PUSH2,0,0),
