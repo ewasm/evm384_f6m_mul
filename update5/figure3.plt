@@ -2,10 +2,10 @@
 # Based on miller_loop_v3.hex and miller_loop_v4.hex
 
 $data << EOD
-v9\\_miller\\_loop\\_f2mul\\_v4 104973
-v9\\_miller\\_loop\\_f2mul\\_v3 106822
-v7\\_miller\\_loop\\_f2mul\\_v4 186384
-v7\\_miller\\_loop\\_f2mul\\_v3 199327
+v9\\_miller\\_loop\\_f2mul\\_v3 113718
+v9\\_miller\\_loop\\_f2mul\\_v4 113718
+v7\\_miller\\_loop\\_f2mul\\_v4 195129
+v7\\_miller\\_loop\\_f2mul\\_v3 206223
 EOD
 
 set term png nocrop enhanced font "verdana,8"

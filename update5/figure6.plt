@@ -2,16 +2,16 @@
 # Based on final_exponentiation_v3.hex and final_exponentiation_v4.hex
 
 $data << EOD
-v9\\_final\\_exp\\_f2mul\\_v3\\_fractional 126409
-v9\\_final\\_exp\\_f2mul\\_v4\\_fractional 126409
-v7\\_final\\_exp\\_f2mul\\_v4\\_fractional 166583
-v7\\_final\\_exp\\_f2mul\\_v3\\_fractional 167798
-v9\\_final\\_exp\\_f2mul\\_v4 175674
-v9\\_final\\_exp\\_f2mul\\_v3 176349
-v7\\_final\\_exp\\_f2mul\\_v4\\_potential 201908
-v7\\_final\\_exp\\_f2mul\\_v3\\_potential 203933
-v7\\_final\\_exp\\_f2mul\\_v4 309588
-v7\\_final\\_exp\\_f2mul\\_v3 314313
+v9\\_final\\_exp\\_f2mul\\_v3\\_fractional 126465
+v9\\_final\\_exp\\_f2mul\\_v4\\_fractional 126465
+v7\\_final\\_exp\\_f2mul\\_v4\\_fractional 166639
+v7\\_final\\_exp\\_f2mul\\_v3\\_fractional 167854
+v9\\_final\\_exp\\_f2mul\\_v3 184601
+v9\\_final\\_exp\\_f2mul\\_v4 184601
+v7\\_final\\_exp\\_f2mul\\_v4\\_potential 201964
+v7\\_final\\_exp\\_f2mul\\_v3\\_potential 203989
+v7\\_final\\_exp\\_f2mul\\_v4 318515
+v7\\_final\\_exp\\_f2mul\\_v3 322565
 EOD
 
 set term png nocrop enhanced font "monospace,8"

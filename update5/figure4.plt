@@ -2,10 +2,10 @@
 # Based on final_exponentiation_v3.hex and final_exponentiation_v4.hex
 
 $data << EOD
-v9\\_final\\_exp\\_f2mul\\_v4 175674
-v9\\_final\\_exp\\_f2mul\\_v3 176349
-v7\\_final\\_exp\\_f2mul\\_v4 309588
-v7\\_final\\_exp\\_f2mul\\_v3 314313
+v9\\_final\\_exp\\_f2mul\\_v3 184601
+v9\\_final\\_exp\\_f2mul\\_v4 184601
+v7\\_final\\_exp\\_f2mul\\_v4 318515
+v7\\_final\\_exp\\_f2mul\\_v3 322565
 EOD
 
 set term png nocrop enhanced font "monospace,8"
