@@ -32,6 +32,68 @@ opcode_costs = {
  'RETURN': 0
 }
 
+modela = opcode_costs.copy()
+modela['ADDMOD384']=2
+modela['SUBMOD384']=2
+modela['MULMODMONT384']=6
+modela['PUSH']=3
+modela['DUP']=3
+modela['MSTORE']=3
+modela['MLOAD']=3
+
+modela_pd2 = modela.copy()
+modela_pd2['PUSH']=2
+modela_pd2['DUP']=2
+
+modela_repriced = modela.copy()
+modela_repriced['ADDMOD384']=2
+modela_repriced['SUBMOD384']=2
+modela_repriced['MULMODMONT384']=5
+modela_repriced['PUSH']=1
+modela_repriced['DUP']=1
+modela_repriced['MSTORE']=1
+modela_repriced['MLOAD']=1
+
+modela_fractional = modela.copy()
+modela_fractional['ADDMOD384']=1.1
+modela_fractional['SUBMOD384']=1.1
+modela_fractional['MULMODMONT384']=5
+modela_fractional['PUSH']=0.9
+modela_fractional['DUP']=0.7
+modela_fractional['MSTORE']=0.8
+modela_fractional['MLOAD']=1
+
+modelb = opcode_costs.copy()
+modelb['ADDMOD384']=1
+modelb['SUBMOD384']=1
+modelb['MULMODMONT384']=3
+modelb['PUSH']=3
+modelb['DUP']=3
+modelb['MSTORE']=3
+modelb['MLOAD']=3
+
+modelb_pd2 = modelb.copy()
+modelb_pd2['PUSH']=2
+modelb_pd2['DUP']=2
+
+modelb_repriced = modelb.copy()
+modelb_repriced['ADDMOD384']=1
+modelb_repriced['SUBMOD384']=1
+modelb_repriced['MULMODMONT384']=3
+modelb_repriced['PUSH']=1
+modelb_repriced['DUP']=1
+modelb_repriced['MSTORE']=1
+modelb_repriced['MLOAD']=1
+
+modelb_fractional = modelb.copy()
+modelb_fractional['ADDMOD384']=0.8
+modelb_fractional['SUBMOD384']=0.7
+modelb_fractional['MULMODMONT384']=3
+modelb_fractional['PUSH']=0.9
+modelb_fractional['DUP']=0.7
+modelb_fractional['MSTORE']=0.8
+modelb_fractional['MLOAD']=1
+
 # gas costs with PUSH costing 2 gas
 opcode_costs_potential = {key: value for key, value in opcode_costs.items()}
 opcode_costs_potential['ADDMOD384']=2
@@ -82,21 +144,43 @@ memory_length_miller_loop_f2mul_v3=15712
 opcode_counts_miller_loop_f2mul_v3={'PUSH16': 30835, 'ADDMOD384': 12182, 'SUBMOD384': 11786, 'MULMODMONT384': 6867, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1}
 data = {}
 data.update({
- "v7\\\\_miller\\\\_loop\\\\_f2mul\\\\_v3": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,opcode_costs,0,1),
- "v7\\\\_miller\\\\_loop\\\\_f2mul\\\\_v3\\\\_potential": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,opcode_costs_potential,0,1),
- "v7\\\\_miller\\\\_loop\\\\_f2mul\\\\_v3\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,opcode_costs_fractional,0,1),
- "v9\\\\_miller\\\\_loop\\\\_f2mul\\\\_v3": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,opcode_costs,1,1),
- "v9\\\\_miller\\\\_loop\\\\_f2mul\\\\_v3\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,opcode_costs_fractional,1,1),
+ "v7\\\\_modela": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela,0,1),
+ "v7\\\\_modela\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_pd2,0,1),
+ "v7\\\\_modela\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_repriced,0,1),
+ "v7\\\\_modela\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_fractional,0,1),
+ "v9\\\\_modela": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela,1,1),
+ "v9\\\\_modela\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_pd2,1,1),
+ "v9\\\\_modela\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_repriced,1,1),
+ "v9\\\\_modela\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_fractional,1,1),
+ "v7\\\\_modelb": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb,0,1),
+ "v7\\\\_modelb\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_pd2,0,1),
+ "v7\\\\_modelb\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_repriced,0,1),
+ "v7\\\\_modelb\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_fractional,0,1),
+ "v9\\\\_modelb": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb,1,1),
+ "v9\\\\_modelb\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_pd2,1,1),
+ "v9\\\\_modelb\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_repriced,1,1),
+ "v9\\\\_modelb\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_fractional,1,1),
  })
 
 memory_length_miller_loop_f2mul_v4=15712
 opcode_counts_miller_loop_f2mul_v4={'PUSH16': 27137, 'ADDMOD384': 10333, 'MULMODMONT384': 8716, 'SUBMOD384': 8088, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1}
 data.update({
- "v7\\\\_miller\\\\_loop\\\\_f2mul\\\\_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,opcode_costs,0,1),
- "v7\\\\_miller\\\\_loop\\\\_f2mul\\\\_v4\\\\_potential": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,opcode_costs_potential,0,1),
- "v7\\\\_miller\\\\_loop\\\\_f2mul\\\\_v4\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,opcode_costs_fractional,0,1),
- "v9\\\\_miller\\\\_loop\\\\_f2mul\\\\_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,opcode_costs,1,1),
- "v9\\\\_miller\\\\_loop\\\\_f2mul\\\\_v4\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,opcode_costs_fractional,1,1),
+ "v7\\\\_modela_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela,0,1),
+ "v7\\\\_modela\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_pd2,0,1),
+ "v7\\\\_modela\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_repriced,0,1),
+ "v7\\\\_modela\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_fractional,0,1),
+ "v9\\\\_modela_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela,1,1),
+ "v9\\\\_modela\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_pd2,1,1),
+ "v9\\\\_modela\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_repriced,1,1),
+ "v9\\\\_modela\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_fractional,1,1),
+ "v7\\\\_modelb_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb,0,1),
+ "v7\\\\_modelb\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_pd2,0,1),
+ "v7\\\\_modelb\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_repriced,0,1),
+ "v7\\\\_modelb\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_fractional,0,1),
+ "v9\\\\_modelb_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb,1,1),
+ "v9\\\\_modelb\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_pd2,1,1),
+ "v9\\\\_modelb\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_repriced,1,1),
+ "v9\\\\_modelb\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_fractional,1,1),
  })
 
 for k in sorted(data, key=data.get, reverse=False):
