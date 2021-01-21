@@ -1,5 +1,7 @@
 # run: python3 gascosts_calculator.py
 
+# Originally from https://gist.github.com/poemm/396917e85af87ce7b550c53986883762
+
 # this file is used to calculate gas costs for EVM384 update 5.
 # Note: gas costs calculated here are off of evmone by like 21 gas, very small error
 
@@ -41,9 +43,9 @@ modela['DUP']=3
 modela['MSTORE']=3
 modela['MLOAD']=3
 
-modela_pd2 = modela.copy()
-modela_pd2['PUSH']=2
-modela_pd2['DUP']=2
+modela_pushdup2 = modela.copy()
+modela_pushdup2['PUSH']=2
+modela_pushdup2['DUP']=2
 
 modela_repriced = modela.copy()
 modela_repriced['ADDMOD384']=2
@@ -72,9 +74,9 @@ modelb['DUP']=3
 modelb['MSTORE']=3
 modelb['MLOAD']=3
 
-modelb_pd2 = modelb.copy()
-modelb_pd2['PUSH']=2
-modelb_pd2['DUP']=2
+modelb_pushdup2 = modelb.copy()
+modelb_pushdup2['PUSH']=2
+modelb_pushdup2['DUP']=2
 
 modelb_repriced = modelb.copy()
 modelb_repriced['ADDMOD384']=1
@@ -93,27 +95,6 @@ modelb_fractional['PUSH']=0.9
 modelb_fractional['DUP']=0.7
 modelb_fractional['MSTORE']=0.8
 modelb_fractional['MLOAD']=1
-
-# gas costs with PUSH costing 2 gas
-opcode_costs_potential = {key: value for key, value in opcode_costs.items()}
-opcode_costs_potential['ADDMOD384']=2
-opcode_costs_potential['SUBMOD384']=2
-opcode_costs_potential['MULMODMONT384']=5
-opcode_costs_potential['PUSH']=1
-opcode_costs_potential['DUP']=1
-opcode_costs_potential['MSTORE']=3
-opcode_costs_potential['MLOAD']=3
-
-# fractional gas costs
-opcode_costs_fractional = {key: value for key, value in opcode_costs.items()}
-opcode_costs_fractional['ADDMOD384']=1.5
-opcode_costs_fractional['SUBMOD384']=1.5
-opcode_costs_fractional['MULMODMONT384']=4.5
-opcode_costs_fractional['PUSH']=0.9
-opcode_costs_fractional['DUP']=0.7
-opcode_costs_fractional['MSTORE']=2.5
-opcode_costs_fractional['MLOAD']=1.5
-
 
 # the main function to compute gas costs
 def gas_cost(memory_length, opcode_counts, opcode_costs, no_PUSH16_flag, miller_or_finalexp_flag):
@@ -145,44 +126,28 @@ opcode_counts_miller_loop_f2mul_v3={'PUSH16': 30835, 'ADDMOD384': 12182, 'SUBMOD
 data = {}
 data.update({
  "v7\\\\_modela": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela,0,1),
- "v7\\\\_modela\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_pd2,0,1),
+ "v7\\\\_modela\\\\_pushdup2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_pushdup2,0,1),
  "v7\\\\_modela\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_repriced,0,1),
  "v7\\\\_modela\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_fractional,0,1),
  "v9\\\\_modela": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela,1,1),
- "v9\\\\_modela\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_pd2,1,1),
+ "v9\\\\_modela\\\\_pushdup2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_pushdup2,1,1),
  "v9\\\\_modela\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_repriced,1,1),
  "v9\\\\_modela\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modela_fractional,1,1),
  "v7\\\\_modelb": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb,0,1),
- "v7\\\\_modelb\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_pd2,0,1),
+ "v7\\\\_modelb\\\\_pushdup2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_pushdup2,0,1),
  "v7\\\\_modelb\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_repriced,0,1),
  "v7\\\\_modelb\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_fractional,0,1),
  "v9\\\\_modelb": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb,1,1),
- "v9\\\\_modelb\\\\_pd2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_pd2,1,1),
+ "v9\\\\_modelb\\\\_pushdup2": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_pushdup2,1,1),
  "v9\\\\_modelb\\\\_repriced": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_repriced,1,1),
  "v9\\\\_modelb\\\\_fractional": gas_cost(memory_length_miller_loop_f2mul_v3,opcode_counts_miller_loop_f2mul_v3,modelb_fractional,1,1),
  })
 
-memory_length_miller_loop_f2mul_v4=15712
-opcode_counts_miller_loop_f2mul_v4={'PUSH16': 27137, 'ADDMOD384': 10333, 'MULMODMONT384': 8716, 'SUBMOD384': 8088, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1}
-data.update({
- "v7\\\\_modela_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela,0,1),
- "v7\\\\_modela\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_pd2,0,1),
- "v7\\\\_modela\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_repriced,0,1),
- "v7\\\\_modela\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_fractional,0,1),
- "v9\\\\_modela_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela,1,1),
- "v9\\\\_modela\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_pd2,1,1),
- "v9\\\\_modela\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_repriced,1,1),
- "v9\\\\_modela\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modela_fractional,1,1),
- "v7\\\\_modelb_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb,0,1),
- "v7\\\\_modelb\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_pd2,0,1),
- "v7\\\\_modelb\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_repriced,0,1),
- "v7\\\\_modelb\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_fractional,0,1),
- "v9\\\\_modelb_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb,1,1),
- "v9\\\\_modelb\\\\_pd2_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_pd2,1,1),
- "v9\\\\_modelb\\\\_repriced_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_repriced,1,1),
- "v9\\\\_modelb\\\\_fractional_v4": gas_cost(memory_length_miller_loop_f2mul_v4,opcode_counts_miller_loop_f2mul_v4,modelb_fractional,1,1),
- })
+# v4 costs are dropped for now
+#memory_length_miller_loop_f2mul_v4=15712
+#opcode_counts_miller_loop_f2mul_v4={'PUSH16': 27137, 'ADDMOD384': 10333, 'MULMODMONT384': 8716, 'SUBMOD384': 8088, 'PUSH2': 3181, 'MSTORE': 1536, 'MLOAD': 1532, 'PUSH1': 265, 'JUMPDEST': 129, 'JUMPI': 124, 'SUB': 62, 'LT': 62, 'AND': 62, 'XOR': 62, 'SHR': 62, 'PUSH8': 62, 'DUP1': 62, 'DUP2': 62, 'SWAP1': 62, 'PUSH32': 4, 'CALLDATACOPY': 1, 'POP': 1, 'RETURN': 1}
 
+print("For figure2_miller_loop.plt:")
 for k in sorted(data, key=data.get, reverse=False):
   print(k, data[k])
 
@@ -191,23 +156,28 @@ memory_length_final_exp_f2mul_v3=15424
 opcode_counts_final_exp_f2mul_v3={'PUSH16': 45988, 'ADDMOD384': 24370, 'SUBMOD384': 13867, 'MULMODMONT384': 8196, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1}
 data = {}
 data.update({
- "v7\\\\_final\\\\_exp\\\\_f2mul\\\\_v3": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,opcode_costs,0,0),
- "v7\\\\_final\\\\_exp\\\\_f2mul\\\\_v3\\\\_potential": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,opcode_costs_potential,0,0),
- "v7\\\\_final\\\\_exp\\\\_f2mul\\\\_v3\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,opcode_costs_fractional,0,0),
- "v9\\\\_final\\\\_exp\\\\_f2mul\\\\_v3": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,opcode_costs,1,0),
- "v9\\\\_final\\\\_exp\\\\_f2mul\\\\_v3\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,opcode_costs_fractional,1,0),
-  })
+ "v7\\\\_modela": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela,0,1),
+ "v7\\\\_modela\\\\_pushdup2": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela_pushdup2,0,1),
+ "v7\\\\_modela\\\\_repriced": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela_repriced,0,1),
+ "v7\\\\_modela\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela_fractional,0,1),
+ "v9\\\\_modela": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela,1,1),
+ "v9\\\\_modela\\\\_pushdup2": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela_pushdup2,1,1),
+ "v9\\\\_modela\\\\_repriced": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela_repriced,1,1),
+ "v9\\\\_modela\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modela_fractional,1,1),
+ "v7\\\\_modelb": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb,0,1),
+ "v7\\\\_modelb\\\\_pushdup2": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb_pushdup2,0,1),
+ "v7\\\\_modelb\\\\_repriced": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb_repriced,0,1),
+ "v7\\\\_modelb\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb_fractional,0,1),
+ "v9\\\\_modelb": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb,1,1),
+ "v9\\\\_modelb\\\\_pushdup2": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb_pushdup2,1,1),
+ "v9\\\\_modelb\\\\_repriced": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb_repriced,1,1),
+ "v9\\\\_modelb\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v3,opcode_counts_final_exp_f2mul_v3,modelb_fractional,1,1),
+ })
 
+# v4 costs are dropped for now
 memory_length_final_exp_f2mul_v4=15424
 opcode_counts_final_exp_f2mul_v4={'PUSH16': 44638, 'ADDMOD384': 23695, 'SUBMOD384': 12517, 'MULMODMONT384': 8871, 'PUSH2': 7546, 'MSTORE': 3649, 'MLOAD': 3610, 'PUSH1': 839, 'JUMPDEST': 421, 'DUP1': 367, 'SUB': 315, 'LT': 315, 'JUMPI': 315, 'SWAP1': 315, 'DUP9': 312, 'JUMP': 141, 'POP': 35, 'DUP7': 34, 'DUP6': 22, 'PUSH32': 21, 'DUP2': 18, 'DUP5': 15, 'DUP4': 12, 'DUP3': 11, 'DUP8': 5, 'CALLDATACOPY': 1, 'RETURN': 1}
-data.update({
- "v7\\\\_final\\\\_exp\\\\_f2mul\\\\_v4": gas_cost(memory_length_final_exp_f2mul_v4,opcode_counts_final_exp_f2mul_v4,opcode_costs,0,0),
- "v7\\\\_final\\\\_exp\\\\_f2mul\\\\_v4\\\\_potential": gas_cost(memory_length_final_exp_f2mul_v4,opcode_counts_final_exp_f2mul_v4,opcode_costs_potential,0,0),
- "v7\\\\_final\\\\_exp\\\\_f2mul\\\\_v4\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v4,opcode_counts_final_exp_f2mul_v4,opcode_costs_fractional,0,0),
- "v9\\\\_final\\\\_exp\\\\_f2mul\\\\_v4": gas_cost(memory_length_final_exp_f2mul_v4,opcode_counts_final_exp_f2mul_v4,opcode_costs,1,0),
- "v9\\\\_final\\\\_exp\\\\_f2mul\\\\_v4\\\\_fractional": gas_cost(memory_length_final_exp_f2mul_v4,opcode_counts_final_exp_f2mul_v4,opcode_costs_fractional,1,0),
-  })
 
-
+print("For figure3_final_exp.plt:")
 for k in sorted(data, key=data.get, reverse=False):
   print(k, data[k])

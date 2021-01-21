@@ -11,13 +11,18 @@ To generate the new figures, run `gnuplot figure1.plt` which generates `figure1.
 
 To generate the tracing with evmone, the following command can be used:
 ```
-evmc/bin/evmc run --vm ./lib/libevmone.dylib,O=0,trace `cat final_exponentiation_hard_coded_test_f2mulv3.hex`
+evmc/bin/evmc run --vm ./lib/libevmone.dylib,O=0,trace `cat final_exponentiation_v3.hex`
 ```
 (This assumes to be run in the build directory of the evm384-v7 branch.)
 
 ### opcode counts
 
 To generate opcode counts, one could dissect the generated trace and update the counts in `figure1.plt` and `figure2.plt`.
+
+It is possible to use `evmone` to collect counts:
+```
+./evmc run --vm libevmone.dylib,O=0,trace `cat final_exponentiation_v3.hex` | grep -E "[A-Z0-9][A-Z9-9][A-Z0-9]+" | sort -nr | uniq -c | sort -r
+```
 
 ### gas costs
 
